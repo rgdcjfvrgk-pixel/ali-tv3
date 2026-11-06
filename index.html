@@ -1,0 +1,588 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>علي TV - Ali TV Luxury Streaming</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@300;400;600;700;900&display=swap" rel="stylesheet">
+
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    colors: {
+                        gold: { 100: '#fcf6ba', 300: '#f3e5ab', 500: '#d4af37', 700: '#aa771c', 900: '#5c3d06' },
+                        darkBg: '#0a0a0c',
+                        cardBg: '#131318',
+                    },
+                    fontFamily: { cairo: ['Cairo', 'sans-serif'] }
+                }
+            }
+        }
+    </script>
+    <style>
+        body { font-family: 'Cairo', sans-serif; background-color: #070709; color: #ffffff; overflow-x: hidden; }
+        .gold-text-gradient { background: linear-gradient(135deg, #bf953f 0%, #fcf6ba 25%, #b38728 50%, #fbf5b7 75%, #aa771c 100%); -webkit-background-clip: text; -webkit-text-fill-color: transparent; }
+        .glass-panel { background: rgba(19, 19, 24, 0.75); backdrop-filter: blur(12px); border: 1px solid rgba(212, 175, 55, 0.15); }
+        .glass-card { background: rgba(22, 22, 30, 0.6); backdrop-filter: blur(8px); border: 1px solid rgba(212, 175, 55, 0.1); transition: all 0.3s ease; }
+        .glass-card:hover { transform: translateY(-5px); border-color: rgba(212, 175, 55, 0.6); box-shadow: 0 10px 25px -5px rgba(212, 175, 55, 0.25); }
+        .category-btn.active { background: linear-gradient(135deg, #d4af37 0%, #aa771c 100%); color: #000000; font-weight: 700; }
+        
+        @keyframes marquee {
+            0% { transform: translateX(0%); }
+            100% { transform: translateX(100%); }
+        }
+        .animate-marquee {
+            display: inline-block;
+            white-space: nowrap;
+            animation: marquee 45s linear infinite;
+        }
+
+        .slide-fade {
+            transition: opacity 0.5s ease-in-out;
+        }
+    </style>
+</head>
+<body class="min-h-screen flex flex-col justify-between">
+
+    <!-- نافذة مشغل الفيديو الداخلي للـ MP4 -->
+    <div id="videoModal" class="fixed inset-0 z-50 flex items-center justify-center bg-black/90 backdrop-blur-md px-4 hidden">
+        <div class="glass-panel w-full max-w-3xl rounded-3xl p-5 border-2 border-gold-500/50 shadow-2xl relative overflow-hidden flex flex-col items-center">
+            
+            <button onclick="closeVideoPlayer()" class="absolute top-4 left-4 z-20 w-9 h-9 rounded-full bg-black/80 border border-gold-500/40 text-gold-400 hover:bg-gold-500 hover:text-black transition-all flex items-center justify-center font-bold text-base shadow-lg">
+                <i class="fa-solid fa-xmark"></i>
+            </button>
+
+            <h3 id="videoTitleDisplay" class="text-lg font-black gold-text-gradient mb-3 text-center">عنوان الحلقة</h3>
+
+            <div class="w-full bg-black rounded-2xl overflow-hidden border border-gold-500/30 relative aspect-video flex items-center justify-center shadow-2xl">
+                <video id="customVideoPlayer" class="w-full h-full object-contain" controls playsinline>
+                    متصفحك لا يدعم تشغيل الفيديو.
+                </video>
+            </div>
+
+            <div class="flex items-center justify-center gap-4 mt-4 w-full">
+                <button onclick="skipTime(-10)" class="px-4 py-2 rounded-xl bg-black/60 border border-gold-500/30 text-gold-300 hover:bg-gold-500/20 text-xs font-bold flex items-center gap-2 transition-all">
+                    <i class="fa-solid fa-rotate-right"></i> ترجيع 10ث
+                </button>
+                <button onclick="togglePlayPause()" id="playPauseBtn" class="px-6 py-2 rounded-xl bg-gradient-to-r from-gold-500 to-gold-700 text-black text-xs font-extrabold flex items-center gap-2 shadow-lg hover:scale-105 transition-all">
+                    <i class="fa-solid fa-pause"></i> إيقاف مؤقت
+                </button>
+                <button onclick="skipTime(10)" class="px-4 py-2 rounded-xl bg-black/60 border border-gold-500/30 text-gold-300 hover:bg-gold-500/20 text-xs font-bold flex items-center gap-2 transition-all">
+                    تقديم 10ث <i class="fa-solid fa-rotate-left"></i>
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Header Section -->
+    <header class="sticky top-0 z-40 glass-panel border-b border-gold-500/20 px-4 lg:px-8 py-3">
+        <div class="max-w-7xl mx-auto flex items-center justify-between">
+            <div class="flex items-center gap-3">
+                <div class="relative w-12 h-12 flex items-center justify-center rounded-xl bg-gradient-to-br from-gold-500/20 to-black border border-gold-500/40">
+                    <svg class="w-8 h-8 text-gold-500" viewBox="0 0 24 24" fill="currentColor">
+                        <path d="M5 16L3 5l5.5 5L12 4l3.5 6L21 5l-2 11H5zm14 3c0 .6-.4 1-1 1H6c-.6 0-1-.4-1-1v-1h14v1z"></path>
+                    </svg>
+                </div>
+                <div>
+                    <h1 class="text-2xl font-black tracking-wide gold-text-gradient leading-none">علي TV</h1>
+                    <span class="text-[10px] tracking-widest text-gold-300/70 uppercase">البث المباشر الفاخر</span>
+                </div>
+            </div>
+
+            <div class="flex items-center gap-3">
+                <a href="tg://resolve?domain=GOAL365a" onclick="openTelegram(event)" title="قناة التليجرام"
+                    class="flex items-center justify-center w-10 h-10 rounded-xl border border-gold-500/30 bg-black/60 hover:bg-gold-500/20 hover:border-gold-500 transition-all text-gold-500 shadow-inner">
+                    <i class="fa-brands fa-telegram text-xl"></i>
+                </a>
+
+                <div class="flex items-center gap-2 px-3 py-1.5 rounded-xl border border-gold-500/30 bg-black/60 shadow-inner">
+                    <i class="fa-solid fa-clock text-gold-500 animate-pulse text-sm"></i>
+                    <div class="text-xs font-bold text-gold-300 flex items-center gap-1 dir-ltr">
+                        <span id="iraqClock">00:00:00</span>
+                        <span id="iraqAmpm" class="text-[10px] text-gold-500 font-normal">ص</span>
+                    </div>
+                </div>
+            </div>
+
+            <div class="relative hidden md:block w-72">
+                <input type="text" id="searchInput" oninput="filterChannels()" placeholder="ابحث عن قناة أو فيلم أو مسلسل..." 
+                    class="w-full bg-black/60 border border-gold-500/30 rounded-full py-2 pr-10 pl-4 text-sm text-gold-100 placeholder-gray-500 focus:outline-none focus:border-gold-500">
+                <i class="fa-solid fa-magnifying-glass absolute right-3.5 top-3 text-gold-500/60 text-sm"></i>
+            </div>
+        </div>
+    </header>
+
+    <!-- الشريط الإعلاني المتحرك الجديد -->
+    <div class="bg-gradient-to-r from-black via-gold-900/40 to-black border-y border-gold-500/30 py-2 overflow-hidden relative">
+        <div class="w-full overflow-hidden">
+            <div class="animate-marquee text-xs sm:text-sm font-semibold text-gold-300">
+                أهلاً وسهلاً بكم في تطبيق عـليTV للمشاهدة المجانية للمباريات والمسلسلات والأفلام والمزيد من الرياضات وقنوات عالمية عربية اجنبية ولاتينية .. جميع القنوات محفوظة لدى التطبيق ادعم التطبيق عبر الماستر كارد <span class="font-mono text-gold-100 bg-gold-500/20 px-2 py-0.5 rounded border border-gold-500/40">910180852097</span>
+            </div>
+        </div>
+    </div>
+
+    <main class="max-w-7xl mx-auto px-4 lg:px-8 py-6 flex-grow w-full">
+        
+        <!-- بانر الأحداث والمباريات الحية المتحرك مع توقيت واضح -->
+        <div class="glass-panel p-5 rounded-2xl mb-8 text-center border border-gold-500/30 relative overflow-hidden shadow-2xl">
+            <button onclick="prevSlide()" class="absolute right-3 top-1/2 -translate-y-1/2 z-20 w-8 h-8 rounded-full bg-black/60 border border-gold-500/40 text-gold-400 hover:bg-gold-500 hover:text-black transition-all flex items-center justify-center text-xs shadow-lg">
+                <i class="fa-solid fa-chevron-right"></i>
+            </button>
+            <button onclick="nextSlide()" class="absolute left-3 top-1/2 -translate-y-1/2 z-20 w-8 h-8 rounded-full bg-black/60 border border-gold-500/40 text-gold-400 hover:bg-gold-500 hover:text-black transition-all flex items-center justify-center text-xs shadow-lg">
+                <i class="fa-solid fa-chevron-left"></i>
+            </button>
+
+            <div id="matchSliderContainer" class="slide-fade max-w-xl mx-auto flex flex-col items-center"></div>
+
+            <div id="sliderDots" class="flex items-center justify-center gap-2 mt-4"></div>
+        </div>
+
+        <section class="mb-6">
+            <div class="flex items-center gap-2 overflow-x-auto pb-2" id="categoriesContainer"></div>
+        </section>
+
+        <section>
+            <div class="flex items-center justify-between mb-4">
+                <h3 class="text-md font-semibold text-gray-300" id="selectedCategoryTitle">جميع الأقسام</h3>
+                <span class="text-xs text-gold-500/80" id="channelCount">0 عنصر متوفر</span>
+            </div>
+            <div class="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-6 gap-4" id="channelsGrid"></div>
+        </section>
+    </main>
+
+    <footer class="glass-panel border-t border-gold-500/25 mt-12 py-4 px-4 text-center text-xs text-gray-400">
+        تطبيق علي TV - جميع الحقوق محفوظة © 2026
+    </footer>
+
+    <script>
+        // ==========================================
+        // ⚽ قائمة المباريات الجديدة المحدثة بالبانر والروابط
+        // ==========================================
+        const importantMatches = [
+            {
+                id: 1,
+                tournament: "🇪🇸 الدوري الإسباني الممتاز",
+                team1Name: "فالنسيا",
+                team1Logo: "🦇",
+                team2Name: "ريال مدريد",
+                team2Logo: "👑",
+                time: "11:00 م",
+                channelName: "بين سبورت 1",
+                streamUrl: "http://silka.m3um9xplus.org:2052/live/30635000266893/85606299443755/677039.ts"
+            },
+            {
+                id: 2,
+                tournament: "🇮🇶 دوري نجوم العراق",
+                team1Name: "القوة الجوية",
+                team1Logo: "🦅",
+                team2Name: "الكرخ",
+                team2Logo: "🟡",
+                time: "04:00 م",
+                channelName: "العراقية الرياضية",
+                streamUrl: "http://silka.m3um9xplus.org:2052/live/30635000266893/85606299443755/97079.ts"
+            },
+            {
+                id: 3,
+                tournament: "🏴󠁧󠁢󠁥󠁮󠁧󠁿 الدوري الإنجليزي الممتاز",
+                team1Name: "ليدز يونايتد",
+                team1Logo: "⚪",
+                team2Name: "توتنهام",
+                team2Logo: "🐓",
+                time: "03:30 م",
+                channelName: "بين سبورت 1",
+                streamUrl: "http://silka.m3um9xplus.org:2052/live/30635000266893/85606299443755/677039.ts"
+            },
+            {
+                id: 4,
+                tournament: "🏴󠁧󠁢󠁥󠁮󠁧󠁿 الدوري الإنجليزي الممتاز",
+                team1Name: "ارسنال",
+                team1Logo: "🔴",
+                team2Name: "هال سيتي",
+                team2Logo: "🐅",
+                time: "06:00 م",
+                channelName: "بين سبورت 1",
+                streamUrl: "http://silka.m3um9xplus.org:2052/live/30635000266893/85606299443755/677039.ts"
+            },
+            {
+                id: 5,
+                tournament: "🏴󠁧󠁢󠁥󠁮󠁧󠁿 الدوري الإنجليزي الممتاز",
+                team1Name: "مان سيتي",
+                team1Logo: "🔵",
+                team2Name: "نوتنغهام",
+                team2Logo: "🌳",
+                time: "08:30 م",
+                channelName: "بين سبورت 1",
+                streamUrl: "http://silka.m3um9xplus.org:2052/live/30635000266893/85606299443755/677039.ts"
+            },
+            {
+                id: 6,
+                tournament: "🇺🇸 الدوري الأمريكي",
+                team1Name: "انتر ميامي",
+                team1Logo: "🩷",
+                team2Name: "شارلوت",
+                team2Logo: "👑",
+                time: "11:59 م",
+                channelName: "الوان الرياضية 2",
+                streamUrl: "http://silka.m3um9xplus.org:2052/live/30635000266893/85606299443755/649690.ts"
+            }
+        ];
+
+        let currentSlideIndex = 0;
+        let slideInterval;
+
+        function renderSlide() {
+            const container = document.getElementById('matchSliderContainer');
+            const dotsContainer = document.getElementById('sliderDots');
+            const match = importantMatches[currentSlideIndex];
+
+            container.style.opacity = '0';
+            setTimeout(() => {
+                container.innerHTML = `
+                    <div class="flex items-center justify-center gap-2 mb-3">
+                        <span class="inline-block bg-gold-500/20 border border-gold-500/40 text-gold-300 text-xs font-bold px-3 py-1 rounded-full animate-pulse">
+                            ${match.tournament}
+                        </span>
+                        <span class="inline-block bg-black/60 border border-gold-500/30 text-gold-400 text-xs font-semibold px-2.5 py-1 rounded-full">
+                            📺 ${match.channelName}
+                        </span>
+                    </div>
+                    
+                    <div class="flex items-center justify-around w-full my-3 bg-black/40 py-4 px-4 rounded-2xl border border-gold-500/20">
+                        <div class="flex flex-col items-center gap-1.5 w-1/3">
+                            <div class="w-14 h-14 rounded-full bg-blue-900/40 border-2 border-gold-500/40 flex items-center justify-center text-2xl shadow-lg">
+                                ${match.team1Logo}
+                            </div>
+                            <span class="text-xs font-bold text-gray-100 truncate w-full">${match.team1Name}</span>
+                        </div>
+
+                        <div class="flex flex-col items-center justify-center w-1/3">
+                            <span class="text-gold-500 font-black text-lg">VS</span>
+                            <span class="text-xs font-black text-gold-200 bg-gold-500/20 px-3 py-1 rounded-full border border-gold-500/40 mt-1.5 shadow-md flex items-center gap-1">
+                                <i class="fa-solid fa-clock text-[10px] text-gold-400"></i> ${match.time}
+                            </span>
+                        </div>
+
+                        <div class="flex flex-col items-center gap-1.5 w-1/3">
+                            <div class="w-14 h-14 rounded-full bg-sky-900/40 border-2 border-gold-500/40 flex items-center justify-center text-2xl shadow-lg">
+                                ${match.team2Logo}
+                            </div>
+                            <span class="text-xs font-bold text-gray-100 truncate w-full">${match.team2Name}</span>
+                        </div>
+                    </div>
+
+                    <a href="${match.streamUrl}" target="_blank" 
+                        class="mt-3 px-6 py-2.5 rounded-xl bg-gradient-to-r from-gold-500 to-gold-700 text-black font-extrabold text-xs flex items-center gap-2 hover:scale-105 transition-all shadow-lg shadow-gold-500/30">
+                        <i class="fa-solid fa-play text-sm"></i> شاهد المباراة (${match.channelName})
+                    </a>
+                `;
+                container.style.opacity = '1';
+            }, 250);
+
+            dotsContainer.innerHTML = importantMatches.map((_, idx) => `
+                <button onclick="goToSlide(${idx})" class="w-2.5 h-2.5 rounded-full transition-all ${idx === currentSlideIndex ? 'bg-gold-500 w-6' : 'bg-gray-600'}"></button>
+            `).join('');
+        }
+
+        function nextSlide() {
+            currentSlideIndex = (currentSlideIndex + 1) % importantMatches.length;
+            renderSlide();
+            resetSlideTimer();
+        }
+
+        function prevSlide() {
+            currentSlideIndex = (currentSlideIndex - 1 + importantMatches.length) % importantMatches.length;
+            renderSlide();
+            resetSlideTimer();
+        }
+
+        function goToSlide(index) {
+            currentSlideIndex = index;
+            renderSlide();
+            resetSlideTimer();
+        }
+
+        function startSlideTimer() {
+            slideInterval = setInterval(nextSlide, 8000);
+        }
+
+        function resetSlideTimer() {
+            clearInterval(slideInterval);
+            startSlideTimer();
+        }
+
+        // ==========================================
+        // 🌟 قائمة الأقسام والقنوات الأساسية
+        // ==========================================
+        const categories = [
+            { id: 'all', name: 'الكل', icon: 'fa-border-all' },
+            { id: 'bein', name: 'قنوات بين سبورت', icon: 'fa-futbol' },
+            { id: 'alwan', name: 'باقة قنوات الـوان', icon: 'fa-palette' },
+            { id: 'arabic_sports', name: 'العربية الرياضية', icon: 'fa-trophy' },
+            { id: 'kurdish_sports', name: 'الرياضة الكردية', icon: 'fa-person-running' },
+            { id: 'fajr', name: 'قنوات الفجر', icon: 'fa-sun' },
+            { id: 'solo', name: 'سولو سبورت', icon: 'fa-fire' },
+            { id: 'series', name: 'مسلسلات عربية', icon: 'fa-clapperboard' },
+            { id: 'cinema', name: 'السينما والأفلام', icon: 'fa-film' },
+            { id: 'scores', name: 'نتائج المباريات', icon: 'fa-chart-line' }
+        ];
+
+        const channels = [
+            // --- بين سبورت 4K ---
+            { id: 1, name: 'بين سبورت 1 4K', category: 'bein', quality: '4K', logo: '⚽', streamUrl: 'http://silka.m3um9xplus.org:2052/live/30635000266893/85606299443755/677039.ts' },
+            { id: 2, name: 'بين سبورت 2 4K', category: 'bein', quality: '4K', logo: '⚽', streamUrl: 'http://silka.m3um9xplus.org:2052/live/30635000266893/85606299443755/677040.ts' },
+            { id: 3, name: 'بين سبورت 3 4K', category: 'bein', quality: '4K', logo: '⚽', streamUrl: 'http://silka.m3um9xplus.org:2052/live/30635000266893/85606299443755/677041.ts' },
+            { id: 4, name: 'بين سبورت 4 4K', category: 'bein', quality: '4K', logo: '⚽', streamUrl: 'http://silka.m3um9xplus.org:2052/live/30635000266893/85606299443755/677042.ts' },
+            { id: 5, name: 'بين سبورت 5 4K', category: 'bein', quality: '4K', logo: '⚽', streamUrl: 'http://silka.m3um9xplus.org:2052/live/30635000266893/85606299443755/677043.ts' },
+
+            // --- بين سبورت SD ---
+            { id: 6, name: 'بين سبورت 1 SD', category: 'bein', quality: 'SD', logo: '⚽', streamUrl: 'http://silka.m3um9xplus.org:2052/live/30635000266893/85606299443755/677075.ts' },
+            { id: 7, name: 'بين سبورت 2 SD', category: 'bein', quality: 'SD', logo: '⚽', streamUrl: 'http://silka.m3um9xplus.org:2052/live/30635000266893/85606299443755/677076.ts' },
+            { id: 8, name: 'بين سبورت 3 SD', category: 'bein', quality: 'SD', logo: '⚽', streamUrl: 'http://silka.m3um9xplus.org:2052/live/30635000266893/85606299443755/677077.ts' },
+            { id: 9, name: 'بين سبورت 4 SD', category: 'bein', quality: 'SD', logo: '⚽', streamUrl: 'http://silka.m3um9xplus.org:2052/live/30635000266893/85606299443755/677078.ts' },
+            { id: 10, name: 'بين سبورت 5 SD', category: 'bein', quality: 'SD', logo: '⚽', streamUrl: 'http://silka.m3um9xplus.org:2052/live/30635000266893/85606299443755/677079.ts' },
+
+            // --- بين سبورت HD ---
+            { id: 11, name: 'بين سبورت 1 HD', category: 'bein', quality: 'HD', logo: '⚽', streamUrl: 'http://otx.arabitv5.com:8000/live/shehm.ahmad/nxyP8RtNHMUQ/21641.ts' },
+            { id: 12, name: 'بين سبورت 2 HD', category: 'bein', quality: 'HD', logo: '⚽', streamUrl: 'http://otx.arabitv5.com:8000/live/shehm.ahmad/nxyP8RtNHMUQ/21640.ts' },
+            { id: 13, name: 'بين سبورت 3 HD', category: 'bein', quality: 'HD', logo: '⚽', streamUrl: 'http://otx.arabitv5.com:8000/live/shehm.ahmad/nxyP8RtNHMUQ/21639.ts' },
+            { id: 14, name: 'بين سبورت 4 HD', category: 'bein', quality: 'HD', logo: '⚽', streamUrl: 'http://otx.arabitv5.com:8000/live/shehm.ahmad/nxyP8RtNHMUQ/21638.ts' },
+            { id: 15, name: 'بين سبورت 5 HD', category: 'bein', quality: 'HD', logo: '⚽', streamUrl: 'http://otx.arabitv5.com:8000/live/shehm.ahmad/nxyP8RtNHMUQ/21637.ts' },
+
+            // --- باقة قنوات الـوان ---
+            { id: 16, name: 'الوان الرياضية 1 4K', category: 'alwan', quality: '4K', logo: '🎨', streamUrl: 'http://silka.m3um9xplus.org:2052/live/30635000266893/85606299443755/649689.ts' },
+            { id: 17, name: 'الوان الرياضية 2 4K', category: 'alwan', quality: '4K', logo: '🎨', streamUrl: 'http://silka.m3um9xplus.org:2052/live/30635000266893/85606299443755/649690.ts' },
+            { id: 18, name: 'الوان الرياضية 3 4K', category: 'alwan', quality: '4K', logo: '🎨', streamUrl: 'http://silka.m3um9xplus.org:2052/live/30635000266893/85606299443755/649691.ts' },
+            { id: 19, name: 'الوان الرياضية 4 4K', category: 'alwan', quality: '4K', logo: '🎨', streamUrl: 'http://silka.m3um9xplus.org:2052/live/30635000266893/85606299443755/649692.ts' },
+            { id: 20, name: 'الوان الرياضية 5 4K', category: 'alwan', quality: '4K', logo: '🎨', streamUrl: 'http://silka.m3um9xplus.org:2052/live/30635000266893/85606299443755/649693.ts' },
+            { id: 21, name: 'الوان الرياضية 6 4K', category: 'alwan', quality: '4K', logo: '🎨', streamUrl: 'http://silka.m3um9xplus.org:2052/live/30635000266893/85606299443755/649694.ts' },
+            { id: 22, name: 'الوان الرياضية 7 4K', category: 'alwan', quality: '4K', logo: '🎨', streamUrl: 'http://silka.m3um9xplus.org:2052/live/30635000266893/85606299443755/649695.ts' },
+            { id: 23, name: 'الوان الرياضية 8 4K', category: 'alwan', quality: '4K', logo: '🎨', streamUrl: 'http://silka.m3um9xplus.org:2052/live/30635000266893/85606299443755/649696.ts' },
+            { id: 24, name: 'الوان الرياضية 9 4K', category: 'alwan', quality: '4K', logo: '🎨', streamUrl: 'http://silka.m3um9xplus.org:2052/live/30635000266893/85606299443755/649697.ts' },
+            
+            { id: 25, name: 'الوان الرياضية 1 SD', category: 'alwan', quality: 'SD', logo: '🎨', streamUrl: 'http://silka.m3um9xplus.org:2052/live/30635000266893/85606299443755/649708.ts' },
+            { id: 26, name: 'الوان الرياضية 2 SD', category: 'alwan', quality: 'SD', logo: '🎨', streamUrl: 'http://silka.m3um9xplus.org:2052/live/30635000266893/85606299443755/649709.ts' },
+            { id: 27, name: 'الوان الرياضية 3 SD', category: 'alwan', quality: 'SD', logo: '🎨', streamUrl: 'http://silka.m3um9xplus.org:2052/live/30635000266893/85606299443755/649710.ts' },
+            { id: 28, name: 'الوان الرياضية 4 SD', category: 'alwan', quality: 'SD', logo: '🎨', streamUrl: 'http://silka.m3um9xplus.org:2052/live/30635000266893/85606299443755/649711.ts' },
+            { id: 29, name: 'الوان الرياضية 5 SD', category: 'alwan', quality: 'SD', logo: '🎨', streamUrl: 'http://silka.m3um9xplus.org:2052/live/30635000266893/85606299443755/649712.ts' },
+            { id: 30, name: 'الوان الرياضية 6 SD', category: 'alwan', quality: 'SD', logo: '🎨', streamUrl: 'http://silka.m3um9xplus.org:2052/live/30635000266893/85606299443755/649713.ts' },
+
+            { id: 31, name: 'الوان UFC', category: 'alwan', quality: 'LIVE', logo: '🥊', streamUrl: 'http://silka.m3um9xplus.org:2052/live/30635000266893/85606299443755/649699.ts' },
+            { id: 32, name: 'الوان F1', category: 'alwan', quality: 'LIVE', logo: '🏎️', streamUrl: 'http://silka.m3um9xplus.org:2052/live/30635000266893/85606299443755/649700.ts' },
+            { id: 33, name: 'الوان WWE', category: 'alwan', quality: '4K', logo: '🤼', streamUrl: 'http://silka.m3um9xplus.org:2052/live/30635000266893/85606299443755/649701.ts' },
+            { id: 34, name: 'الوان افلام 1', category: 'alwan', quality: 'FHD', logo: '🎬', streamUrl: 'http://silka.m3um9xplus.org:2052/live/30635000266893/85606299443755/649714.ts' },
+            { id: 35, name: 'الوان افلام 2', category: 'alwan', quality: 'FHD', logo: '🎬', streamUrl: 'http://silka.m3um9xplus.org:2052/live/30635000266893/85606299443755/649715.ts' },
+            { id: 36, name: 'الوان أطفال 👶', category: 'alwan', quality: 'FHD', logo: '👶', streamUrl: 'http://silka.m3um9xplus.org:2052/live/30635000266893/85606299443755/649720.ts' },
+            { id: 37, name: 'الوان تركي', category: 'alwan', quality: 'FHD', logo: '🇹🇷', streamUrl: 'http://silka.m3um9xplus.org:2052/live/30635000266893/85606299443755/649718.ts' },
+            { id: 38, name: 'الوان أنمي', category: 'alwan', quality: 'FHD', logo: '🌸', streamUrl: 'http://silka.m3um9xplus.org:2052/live/30635000266893/85606299443755/649726.ts' },
+            { id: 39, name: 'الوان كوري', category: 'alwan', quality: 'FHD', logo: '🇰🇷', streamUrl: 'http://silka.m3um9xplus.org:2052/live/30635000266893/85606299443755/649724.ts' },
+            { id: 40, name: 'الوان بوليود', category: 'alwan', quality: 'FHD', logo: '🇮🇳', streamUrl: 'http://silka.m3um9xplus.org:2052/live/30635000266893/85606299443755/649723.ts' },
+            { id: 41, name: 'الوان مسلسلات+', category: 'alwan', quality: '4K', logo: '📺', streamUrl: 'http://silka.m3um9xplus.org:2052/live/30635000266893/85606299443755/649725.ts' },
+
+            // --- العربية الرياضية ---
+            { id: 42, name: 'الرابعة الرياضية 1', category: 'arabic_sports', quality: 'FHD', logo: '🦁', streamUrl: 'http://silka.m3um9xplus.org:2052/live/30635000266893/85606299443755/234644.ts' },
+            { id: 43, name: 'الرابعة الرياضية 2', category: 'arabic_sports', quality: 'FHD', logo: '🦁', streamUrl: 'http://silka.m3um9xplus.org:2052/live/30635000266893/85606299443755/234645.ts' },
+            { id: 44, name: 'الرابعة الرياضية 1+', category: 'arabic_sports', quality: 'FHD', logo: '🦁', streamUrl: 'http://silka.m3um9xplus.org:2052/live/30635000266893/85606299443755/234646.ts' },
+            { id: 45, name: 'الرابعة الرياضية 2+', category: 'arabic_sports', quality: 'FHD', logo: '🦁', streamUrl: 'http://silka.m3um9xplus.org:2052/live/30635000266893/85606299443755/234647.ts' },
+            { id: 46, name: 'العراقية الرياضية', category: 'arabic_sports', quality: 'FHD', logo: '🇮🇶', streamUrl: 'http://silka.m3um9xplus.org:2052/live/30635000266893/85606299443755/97079.ts' },
+            { id: 47, name: 'العراقية السريانية', category: 'arabic_sports', quality: 'FHD', logo: '🇮🇶', streamUrl: 'http://silka.m3um9xplus.org:2052/live/30635000266893/85606299443755/143423.ts' },
+            { id: 48, name: 'الكأس 1', category: 'arabic_sports', quality: 'FHD', logo: '🏆', streamUrl: 'http://silka.m3um9xplus.org:2052/live/30635000266893/85606299443755/20155.ts' },
+            { id: 49, name: 'الكأس 2', category: 'arabic_sports', quality: 'FHD', logo: '🏆', streamUrl: 'http://silka.m3um9xplus.org:2052/live/30635000266893/85606299443755/20156.ts' },
+            { id: 50, name: 'الكأس 3', category: 'arabic_sports', quality: 'FHD', logo: '🏆', streamUrl: 'http://silka.m3um9xplus.org:2052/live/30635000266893/85606299443755/143740.ts' },
+            { id: 51, name: 'الكأس 4', category: 'arabic_sports', quality: 'FHD', logo: '🏆', streamUrl: 'http://silka.m3um9xplus.org:2052/live/30635000266893/85606299443755/20158.ts' },
+            { id: 52, name: 'الكأس 5', category: 'arabic_sports', quality: 'FHD', logo: '🏆', streamUrl: 'http://silka.m3um9xplus.org:2052/live/30635000266893/85606299443755/187864.ts' },
+            { id: 53, name: 'الكأس 6', category: 'arabic_sports', quality: 'FHD', logo: '🏆', streamUrl: 'http://silka.m3um9xplus.org:2052/live/30635000266893/85606299443755/200001.ts' },
+            { id: 54, name: 'الكأس 7', category: 'arabic_sports', quality: 'FHD', logo: '🏆', streamUrl: 'http://silka.m3um9xplus.org:2052/live/30635000266893/85606299443755/392712.ts' },
+            { id: 55, name: 'الكأس 8', category: 'arabic_sports', quality: 'FHD', logo: '🏆', streamUrl: 'http://silka.m3um9xplus.org:2052/live/30635000266893/85606299443755/392713.ts' },
+            { id: 56, name: 'دبي الرياضية 1', category: 'arabic_sports', quality: 'HD', logo: '📺', streamUrl: 'http://silka.m3um9xplus.org:2052/live/30635000266893/85606299443755/97068.ts' },
+            { id: 57, name: 'دبي الرياضية 2', category: 'arabic_sports', quality: 'HD', logo: '📺', streamUrl: 'http://silka.m3um9xplus.org:2052/live/30635000266893/85606299443755/97078.ts' },
+            { id: 58, name: 'ابو ظبي الرياضية 1', category: 'arabic_sports', quality: 'FHD', logo: '🇦🇪', streamUrl: 'http://silka.m3um9xplus.org:2052/live/30635000266893/85606299443755/143757.ts' },
+            { id: 59, name: 'ابو ظبي الرياضية 2', category: 'arabic_sports', quality: 'FHD', logo: '🇦🇪', streamUrl: 'http://silka.m3um9xplus.org:2052/live/30635000266893/85606299443755/143758.ts' },
+            { id: 60, name: 'ثمانية الرياضية 1', category: 'arabic_sports', quality: 'HD', logo: '⭐', streamUrl: 'http://silka.m3um9xplus.org:2052/live/30635000266893/85606299443755/646086.ts' },
+            { id: 61, name: 'ثمانية الرياضية 2', category: 'arabic_sports', quality: 'HD', logo: '⭐', streamUrl: 'http://silka.m3um9xplus.org:2052/live/30635000266893/85606299443755/646087.ts' },
+            { id: 62, name: 'ثمانية الرياضية 3', category: 'arabic_sports', quality: 'HD', logo: '⭐', streamUrl: 'http://silka.m3um9xplus.org:2052/live/30635000266893/85606299443755/646088.ts' },
+            { id: 63, name: 'ستارزبلاي 1', category: 'arabic_sports', quality: 'FHD', logo: '🎬', streamUrl: 'http://silka.m3um9xplus.org:2052/live/30635000266893/85606299443755/67377.ts' },
+            { id: 64, name: 'ستارزبلاي 2', category: 'arabic_sports', quality: 'FHD', logo: '🎬', streamUrl: 'http://silka.m3um9xplus.org:2052/live/30635000266893/85606299443755/67379.ts' },
+            { id: 65, name: 'ستارزبلاي 3', category: 'arabic_sports', quality: 'FHD', logo: '🎬', streamUrl: 'http://silka.m3um9xplus.org:2052/live/30635000266893/85606299443755/648603.ts' },
+            { id: 66, name: 'الأردن الرياضية', category: 'arabic_sports', quality: 'HD', logo: '🇯🇴', streamUrl: 'http://silka.m3um9xplus.org:2052/live/30635000266893/85606299443755/5719.ts' },
+            { id: 67, name: 'ON time 1', category: 'arabic_sports', quality: 'HD', logo: '📺', streamUrl: 'http://silka.m3um9xplus.org:2052/live/30635000266893/85606299443755/20163.ts' },
+            { id: 68, name: 'ON time 2', category: 'arabic_sports', quality: 'HD', logo: '📺', streamUrl: 'http://silka.m3um9xplus.org:2052/live/30635000266893/85606299443755/20164.ts' },
+            { id: 69, name: 'ON sport plus', category: 'arabic_sports', quality: 'HD', logo: '📺', streamUrl: 'http://silka.m3um9xplus.org:2052/live/30635000266893/85606299443755/684337.ts' },
+            { id: 70, name: 'ON sport Max', category: 'arabic_sports', quality: 'HD', logo: '📺', streamUrl: 'http://silka.m3um9xplus.org:2052/live/30635000266893/85606299443755/684338.ts' },
+            { id: 71, name: 'الشارقة الرياضية', category: 'arabic_sports', quality: 'HD', logo: '📺', streamUrl: 'http://silka.m3um9xplus.org:2052/live/30635000266893/85606299443755/143766.ts' },
+
+            // --- الرياضة الكردية ---
+            { id: 72, name: 'DUHOK SPORT 4K', category: 'kurdish_sports', quality: '4K', logo: '☀️', streamUrl: 'http://silka.m3um9xplus.org:2052/live/30635000266893/85606299443755/602828.ts' },
+            { id: 73, name: 'AVA SPORT HD', category: 'kurdish_sports', quality: 'HD', logo: '☀️', streamUrl: 'http://silka.m3um9xplus.org:2052/live/30635000266893/85606299443755/601394.ts' },
+            { id: 74, name: 'NRT SPORT HD', category: 'kurdish_sports', quality: 'HD', logo: '☀️', streamUrl: 'http://silka.m3um9xplus.org:2052/live/30635000266893/85606299443755/601396.ts' },
+            { id: 75, name: 'ASO Sport HD', category: 'kurdish_sports', quality: 'HD', logo: '☀️', streamUrl: 'http://silka.m3um9xplus.org:2052/live/30635000266893/85606299443755/601399.ts' },
+
+            // --- قنوات الفجر ---
+            { id: 76, name: 'الفجر 1', category: 'fajr', quality: 'HD', logo: '🌅', streamUrl: 'http://silka.m3um9xplus.org:2052/live/30635000266893/85606299443755/231970.ts' },
+            { id: 77, name: 'الفجر 2', category: 'fajr', quality: 'HD', logo: '🌅', streamUrl: 'http://silka.m3um9xplus.org:2052/live/30635000266893/85606299443755/231972.ts' },
+            { id: 78, name: 'الفجر 3', category: 'fajr', quality: 'HD', logo: '🌅', streamUrl: 'http://silka.m3um9xplus.org:2052/live/30635000266893/85606299443755/231974.ts' },
+            { id: 79, name: 'الفجر 4', category: 'fajr', quality: 'HD', logo: '🌅', streamUrl: 'http://silka.m3um9xplus.org:2052/live/30635000266893/85606299443755/231976.ts' },
+            { id: 80, name: 'الفجر 5', category: 'fajr', quality: 'HD', logo: '🌅', streamUrl: 'http://silka.m3um9xplus.org:2052/live/30635000266893/85606299443755/231978.ts' },
+
+            // --- سولو سبورت ---
+            { id: 81, name: 'سولو سبورت 1', category: 'solo', quality: 'HD', logo: '🔥', streamUrl: 'http://silka.m3um9xplus.org:2052/live/30635000266893/85606299443755/723479.ts' },
+            { id: 82, name: 'سولو سبورت 2', category: 'solo', quality: 'HD', logo: '🔥', streamUrl: 'http://silka.m3um9xplus.org:2052/live/30635000266893/85606299443755/723483.ts' },
+            { id: 83, name: 'سولو سبورت 3', category: 'solo', quality: 'HD', logo: '🔥', streamUrl: 'http://silka.m3um9xplus.org:2052/live/30635000266893/85606299443755/723487.ts' },
+            { id: 84, name: 'سولو سبورت 4', category: 'solo', quality: 'HD', logo: '🔥', streamUrl: 'http://silka.m3um9xplus.org:2052/live/30635000266893/85606299443755/723491.ts' },
+            { id: 85, name: 'سولو سبورت 5', category: 'solo', quality: 'HD', logo: '🔥', streamUrl: 'http://silka.m3um9xplus.org:2052/live/30635000266893/85606299443755/723495.ts' },
+
+            // --- مسلسلات عربية ---
+            { id: 86, name: 'ليل البنفسج 2 ح1', category: 'series', quality: 'HD', logo: '🎬', isMp4: true, streamUrl: 'http://silka.m3um9xplus.org:2052/series/30635000266893/85606299443755/729042.mp4' },
+            { id: 87, name: 'أبجد هوّس', category: 'series', quality: 'FHD', logo: '🎬', streamUrl: 'http://silka.m3um9xplus.org:2052/live/30635000266893/85606299443755/617961.ts' },
+            { id: 88, name: 'ابو حقي', category: 'series', quality: 'FHD', logo: '🎬', streamUrl: 'http://silka.m3um9xplus.org:2052/live/30635000266893/85606299443755/617962.ts' },
+            { id: 89, name: 'العرضحالجي', category: 'series', quality: 'FHD', logo: '🎬', streamUrl: 'http://silka.m3um9xplus.org:2052/live/30635000266893/85606299443755/617977.ts' },
+            { id: 90, name: 'باب الحارة ج1', category: 'series', quality: 'HD', logo: '🏛️', streamUrl: 'http://silka.m3um9xplus.org:2052/live/30635000266893/85606299443755/618140.ts' },
+            { id: 91, name: 'باب الحارة ج2', category: 'series', quality: 'HD', logo: '🏛️', streamUrl: 'http://silka.m3um9xplus.org:2052/live/30635000266893/85606299443755/618141.ts' },
+            { id: 92, name: 'باب الحارة ج3', category: 'series', quality: 'HD', logo: '🏛️', streamUrl: 'http://silka.m3um9xplus.org:2052/live/30635000266893/85606299443755/618142.ts' },
+            { id: 93, name: 'باب الحارة ج4', category: 'series', quality: 'HD', logo: '🏛️', streamUrl: 'http://silka.m3um9xplus.org:2052/live/30635000266893/85606299443755/618143.ts' },
+            { id: 94, name: 'باب الحارة ج5', category: 'series', quality: 'HD', logo: '🏛️', streamUrl: 'http://silka.m3um9xplus.org:2052/live/30635000266893/85606299443755/618144.ts' },
+            { id: 95, name: 'شباب البومب 13', category: 'series', quality: 'FHD', logo: '📺', streamUrl: 'http://silka.m3um9xplus.org:2052/live/30635000266893/85606299443755/647009.ts' },
+            { id: 96, name: 'أحلام السنين', category: 'series', quality: 'FHD', logo: '🎬', streamUrl: 'http://silka.m3um9xplus.org:2052/live/30635000266893/85606299443755/617963.ts' },
+            { id: 97, name: 'ألماس مكسور', category: 'series', quality: 'FHD', logo: '💎', streamUrl: 'http://silka.m3um9xplus.org:2052/live/30635000266893/85606299443755/617980.ts' },
+
+            // --- قسم السينما والأفلام ---
+            { id: 98, name: 'سينمانا - شبكتي', category: 'cinema', quality: 'VIP', logo: '🍿', streamUrl: 'https://cinemana.shabakaty.com/home' },
+
+            // --- قسم نتائج المباريات ---
+            { id: 99, name: 'نتائج المباريات المباشرة', category: 'scores', quality: 'LIVE', logo: '⚡', streamUrl: 'https://www.ysscores.com/ar/home?utm_source=chatgpt.com' }
+        ];
+
+        let currentCategory = 'all';
+
+        function renderCategories() {
+            const container = document.getElementById('categoriesContainer');
+            container.innerHTML = categories.map(cat => `
+                <button onclick="selectCategory('${cat.id}')" 
+                    class="category-btn px-4 py-2 rounded-xl border border-gold-500/20 glass-card text-xs flex items-center gap-2 whitespace-nowrap text-gray-200 ${cat.id === currentCategory ? 'active' : ''}">
+                    <i class="fa-solid ${cat.icon} text-gold-500"></i>
+                    <span>${cat.name}</span>
+                </button>
+            `).join('');
+        }
+
+        function renderChannels(list) {
+            const grid = document.getElementById('channelsGrid');
+            document.getElementById('channelCount').innerText = `${list.length} عنصر متوفر`;
+
+            if (list.length === 0) {
+                grid.innerHTML = `<div class="col-span-full py-12 text-center text-gray-400"><p>لا توجد نتائج مطابقة لبحثك.</p></div>`;
+                return;
+            }
+
+            grid.innerHTML = list.map(ch => {
+                let clickAction = ch.isMp4 ? `playMp4Video('${ch.name}', '${ch.streamUrl}')` : `window.open('${ch.streamUrl}', '_blank')`;
+                
+                return `
+                    <div onclick="${clickAction}" 
+                        class="glass-card rounded-2xl p-4 flex flex-col items-center justify-between gap-3 group relative overflow-hidden block cursor-pointer">
+                        
+                        <span class="absolute top-2 left-2 bg-black/60 border border-gold-500/30 text-[10px] font-bold text-gold-300 px-2 py-0.5 rounded-md">
+                            ${ch.quality}
+                        </span>
+
+                        <div class="w-16 h-16 rounded-full bg-gradient-to-br from-gold-500/20 to-black border border-gold-500/30 flex items-center justify-center text-2xl group-hover:scale-110 transition-transform mt-2">
+                            ${ch.logo}
+                        </div>
+                        <div class="text-center w-full">
+                            <h4 class="text-xs sm:text-sm font-bold text-gray-100 group-hover:text-gold-300 transition-colors truncate">${ch.name}</h4>
+                            <span class="text-[10px] text-gold-400 mt-1 inline-flex items-center gap-1">
+                                <i class="fa-solid fa-play text-gold-500"></i> ${ch.isMp4 ? 'تشغيل الحلقة' : 'تشغيل آمن'}
+                            </span>
+                        </div>
+                    </div>
+                `;
+            }).join('');
+        }
+
+        function selectCategory(catId) {
+            currentCategory = catId;
+            renderCategories();
+            const catObj = categories.find(c => c.id === catId);
+            document.getElementById('selectedCategoryTitle').innerText = catObj ? catObj.name : 'جميع الأقسام';
+
+            if (catId === 'all') {
+                renderChannels(channels);
+            } else {
+                renderChannels(channels.filter(c => c.category === catId));
+            }
+        }
+
+        function filterChannels() {
+            const query = document.getElementById('searchInput').value.toLowerCase();
+            const baseList = currentCategory === 'all' ? channels : channels.filter(c => c.category === currentCategory);
+            renderChannels(baseList.filter(c => c.name.toLowerCase().includes(query)));
+        }
+
+        function playMp4Video(title, url) {
+            const modal = document.getElementById('videoModal');
+            const videoPlayer = document.getElementById('customVideoPlayer');
+            const titleDisplay = document.getElementById('videoTitleDisplay');
+
+            titleDisplay.innerText = title;
+            videoPlayer.src = url;
+            modal.classList.remove('hidden');
+            videoPlayer.play();
+        }
+
+        function closeVideoPlayer() {
+            const modal = document.getElementById('videoModal');
+            const videoPlayer = document.getElementById('customVideoPlayer');
+            videoPlayer.pause();
+            videoPlayer.src = '';
+            modal.classList.add('hidden');
+        }
+
+        function skipTime(seconds) {
+            const videoPlayer = document.getElementById('customVideoPlayer');
+            videoPlayer.currentTime += seconds;
+        }
+
+        function togglePlayPause() {
+            const videoPlayer = document.getElementById('customVideoPlayer');
+            const btn = document.getElementById('playPauseBtn');
+            if (videoPlayer.paused) {
+                videoPlayer.play();
+                btn.innerHTML = `<i class="fa-solid fa-pause"></i> إيقاف مؤقت`;
+            } else {
+                videoPlayer.pause();
+                btn.innerHTML = `<i class="fa-solid fa-play"></i> تشغيل`;
+            }
+        }
+
+        function updateIraqClock() {
+            const now = new Date();
+            const options = { timeZone: 'Asia/Baghdad', hour12: true, hour: '2-digit', minute: '2-digit', second: '2-digit' };
+            const formatter = new Intl.DateTimeFormat('en-US', options);
+            const timeParts = formatter.formatToParts(now);
+            
+            let hours = '', minutes = '', seconds = '', ampm = '';
+            timeParts.forEach(part => {
+                if (part.type === 'hour') hours = part.value;
+                if (part.type === 'minute') minutes = part.value;
+                if (part.type === 'second') seconds = part.value;
+                if (part.type === 'dayPeriod') ampm = part.value === 'AM' ? 'ص' : 'م';
+            });
+
+            document.getElementById('iraqClock').innerText = `${hours}:${minutes}:${seconds}`;
+            document.getElementById('iraqAmpm').innerText = ampm;
+        }
+
+        setInterval(updateIraqClock, 1000);
+        updateIraqClock();
+
+        window.onload = function() {
+            renderCategories();
+            renderChannels(channels);
+            renderSlide();
+            startSlideTimer();
+        };
+    </script>
+</body>
+</html>
